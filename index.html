@@ -473,12 +473,21 @@ input[type="range"]{
         flex-direction:column;
     }
 }
-/* Force MathJax to inherit the text color from the theme */
-.dark-mode .math-block,
-.dark-mode mjx-container {
-    color: var(--text) !important;
+/* Add the Logo Style here */
+.college-logo {
+    width: 100px; 
+    height: auto;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
+/* Ensure visibility in Dark Mode as requested previously */
+.dark-mode .hero-card {
+    background: radial-gradient(circle at top right, rgba(37,99,235,0.2), transparent 40%), var(--card);
+}
+.dark-mode .math-block, .dark-mode mjx-container {
+    color: var(--text) !important;
+}
 /* Optional: Adjust the background of math blocks for better contrast in dark mode */
 .dark-mode .math-block {
     background: #1e293b; /* Darker slate background */
@@ -496,7 +505,8 @@ input[type="range"]{
 <aside>
 
     <div class="lab-header">
-        <h2>IIIT Hyderabad Style<br>Virtual Aerospace Math Lab</h2>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/PCCOE-Logo-24.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail_unscaled&_=20240402104921" alt="College Logo" class="college-logo">
+        <h2>PCCOE PUNE<br>Virtual Aerospace Math Lab</h2>
         <p>Interactive Polar Integration Environment</p>
     </div>
 
