@@ -473,6 +473,18 @@ input[type="range"]{
         flex-direction:column;
     }
 }
+/* Force MathJax to inherit the text color from the theme */
+.dark-mode .math-block,
+.dark-mode mjx-container {
+    color: var(--text) !important;
+}
+
+/* Optional: Adjust the background of math blocks for better contrast in dark mode */
+.dark-mode .math-block {
+    background: #1e293b; /* Darker slate background */
+    border-color: #334155;
+    border-left-color: var(--accent); /* Uses your cyan accent for the left border */
+}
 
 </style>
 </head>
