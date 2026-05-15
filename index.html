@@ -239,18 +239,6 @@ main{
     white;
 }
 
-/* Ensure Hero Card updates in Dark Mode */
-.dark-mode .hero-card {
-    background: 
-        radial-gradient(
-            circle at top right,
-            rgba(37, 99, 235, 0.2),
-            transparent 40%
-        ),
-        var(--card); /* Uses the dark-mode card color instead of white */
-}
-
-/* Ensure the title and badge remain high-contrast */
 .dark-mode .hero-card h1 {
     color: var(--text);
 }
@@ -446,18 +434,17 @@ input[type="range"]{
 
 @media(max-width:950px){
 
-    body{
-        flex-direction:column;
-        overflow:auto;
+    body {
+        flex-direction: column;
+        overflow-y: auto; /* Allow the whole page to scroll */
     }
-
-    aside{
-        width:100%;
-        height:auto;
+    aside {
+        width: 100%;
+        height: auto;
+        position: relative; /* Ensure it stays at top */
     }
-
-    main{
-        height:auto;
+    main {
+        overflow: visible; /* Prevent double scrollbars */
     }
 
     .content-section{
@@ -973,11 +960,14 @@ function showSection(sectionId){
 
 /* Dark Mode */
 
-document.getElementById('theme-toggle')
-.addEventListener('click',()=>{
-
+document.getElementById('theme-toggle').addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
-
+    
+    // Force re-render of math and plots to apply new theme colors
+    runTheoryMathEngine();
+    if(document.getElementById('simulation').classList.contains('active')) {
+        runSimulationEngine();
+    }
 });
 
 /* Theory Calculator */
@@ -1119,8 +1109,7 @@ function runSimulationEngine(){
         rdrd\\theta
         $$`;
 
-        area=
-        (Math.PI*Math.pow(scalar,2))/2;
+        area = (Math.PI * Math.pow(scalar, 2)) / 4;
     }
 
     document
@@ -1162,39 +1151,34 @@ function runSimulationEngine(){
         fillcolor:'rgba(37,99,235,0.15)'
     }];
 
-    const layout={
-
-        title:{
-            text:'Polar Coordinate Workspace',
-            font:{size:22}
-        },
-
-        paper_bgcolor:'#ffffff',
-
-        font:{
-            family:'Inter,sans-serif'
-        },
-
-        polar:{
-
-            bgcolor:'#ffffff',
-
-            radialaxis:{
-                visible:true,
-                gridcolor:'#e2e8f0'
-            },
-
-            angularaxis:{
-                gridcolor:'#e2e8f0'
+   const isDarkMode = document.body.classList.contains('dark-mode');
+    const layout = {
+        title: {
+            text: 'Polar Coordinate Workspace',
+            font: { 
+                size: 22,
+                color: isDarkMode ? '#f8fafc' : '#0f172a' // Dynamic title color
             }
         },
-
-        margin:{
-            t:70,
-            b:40,
-            l:40,
-            r:40
-        }
+        paper_bgcolor: isDarkMode ? '#0f172a' : '#ffffff', // Dynamic paper color
+        plot_bgcolor: isDarkMode ? '#0f172a' : '#ffffff',
+        font: {
+            family: 'Inter, sans-serif',
+            color: isDarkMode ? '#94a3b8' : '#64748b'
+        },
+        polar: {
+            bgcolor: isDarkMode ? '#1e293b' : '#ffffff', // Dynamic polar area
+            radialaxis: {
+                visible: true,
+                gridcolor: isDarkMode ? '#334155' : '#e2e8f0',
+                tickfont: { color: isDarkMode ? '#94a3b8' : '#64748b' }
+            },
+            angularaxis: {
+                gridcolor: isDarkMode ? '#334155' : '#e2e8f0',
+                tickfont: { color: isDarkMode ? '#94a3b8' : '#64748b' }
+            }
+        },
+        margin: { t: 70, b: 40, l: 40, r: 40 }
     };
 
     Plotly.react(
