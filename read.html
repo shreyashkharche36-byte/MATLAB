@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Virtual Aerospace Mathematics Lab</title>
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<script>
+window.MathJax = {
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+    },
+    svg: {
+        fontCache: 'global'
+    }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --accent:#06b6d4;
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --sidebar:#0f172a;
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --shadow: 0 10px 30px rgba(15,23,42,0.08);
+    --radius:18px;
+    --sidebar-width:300px;
+}
+
+.dark-mode{
+    --bg:#020617;
+    --card:#0f172a;
+    --text:#f8fafc;
+    --muted:#94a3b8;
+    --border:#1e293b;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
+}
+
+body{
+    display:flex;
+    height:100vh;
+    overflow:hidden;
+    background:var(--bg);
+    color:var(--text);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Sidebar */
+aside{
+    width:var(--sidebar-width);
+    background:linear-gradient(180deg, #0f172a 0%, #111827 100%);
+    color:white;
+    display:flex;
+    flex-direction:column;
+    border-right:1px solid rgba(255,255,255,0.08);
+    z-index: 10;
+}
+
+.lab-header{
+    padding:32px 24px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.college-logo {
+    width: 80px; 
+    height: auto;
+    margin-bottom: 15px;
+    display: block;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.lab-header h2{ font-size:1.1rem; font-weight:800; line-height:1.4; }
+.lab-header p{ margin-top:10px; color:#94a3b8; font-size:0.85rem; }
+
+nav{ padding:20px 12px; overflow-y:auto; flex:1; }
+nav button{
+    width:100%; border:none; background:transparent; color:#cbd5e1;
+    padding:14px 18px; margin-bottom:8px; border-radius:12px;
+    text-align:left; font-size:0.96rem; font-weight:500; cursor:pointer;
+    transition:all 0.25s ease;
+}
+nav button:hover{ background:rgba(255,255,255,0.08); color:white; transform:translateX(4px); }
+nav button.active{
+    background:linear-gradient(90deg, rgba(37,99,235,0.25), rgba(6,182,212,0.15));
+    color:white; border:1px solid rgba(255,255,255,0.08);
+}
+
+#theme-toggle{
+    margin:18px; border:none; padding:14px; border-radius:12px;
+    background:#1e293b; color:white; cursor:pointer; font-weight:600;
+}
+
+/* Main Content */
+main{ flex:1; overflow:hidden; position:relative; }
+.content-section{
+    display:none; height:100vh; overflow-y:auto; padding:42px;
+    animation:fadeIn 0.35s ease;
+}
+.content-section.active{ display:block; }
+
+@keyframes fadeIn{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:translateY(0); } }
+
+/* Cards & Components */
+.card{
+    background:var(--card); border-radius:var(--radius); padding:34px;
+    margin-bottom:28px; box-shadow:var(--shadow); border:1px solid var(--border);
+}
+
+.hero-card{
+    min-height:78vh; display:flex; flex-direction:column; justify-content:center;
+    background: radial-gradient(circle at top right, rgba(37,99,235,0.12), transparent 40%), var(--card);
+}
+
+.hero-badge{
+    width:max-content; padding:10px 18px; border-radius:999px;
+    background:#dbeafe; color:#1d4ed8; font-size:0.88rem; font-weight:700; margin-bottom:24px;
+}
+
+.dark-mode .hero-badge { background: rgba(37, 99, 235, 0.2); color: #60a5fa; }
+
+/* Math & Visibility Fixes */
+.math-block{
+    background:#f8fafc; border:1px solid #e2e8f0; border-left:5px solid var(--primary);
+    border-radius:12px; padding:18px; margin:18px 0; overflow-x:auto;
+}
+
+.dark-mode .math-block { background: #1e293b; border-color: #334155; color: var(--text); }
+.dark-mode mjx-container { color: var(--text) !important; }
+
+/* Interactive Elements */
+h1{ font-size:2.4rem; font-weight:800; margin-bottom:18px; }
+p, li{ color:var(--muted); line-height:1.8; }
+.btn{
+    border:none; background:linear-gradient(135deg, var(--primary), var(--accent));
+    color:white; padding:14px 28px; border-radius:14px; font-weight:700;
+    cursor:pointer; transition:all 0.25s ease;
+}
+.btn:hover{ transform:translateY(-2px); box-shadow: 0 10px 24px rgba(37,99,235,0.22); }
+.secondary-btn{ background:#0f172a !important; }
+
+.grid-2{ display:grid; grid-template-columns:1.1fr 0.9fr; gap:28px; }
+#plot-area{ width:100%; height:580px; border-radius:20px; background:white; border:1px solid var(--border); }
+
+/* Form Controls */
+select, input[type="range"]{ width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--text); }
+
+@media(max-width:950px){
+    body{ flex-direction:column; overflow:auto; }
+    aside{ width:100%; }
+    .grid-2{ grid-template-columns:1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<aside>
+    <div class="lab-header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/PCCOE-Logo-24.png" alt="PCCOE Logo" class="college-logo">
+        <h2>PCCOE PUNE<br>Aerospace Math Lab</h2>
+        <p>Interactive Polar Integration</p>
+    </div>
+    <nav>
+        <button onclick="showSection('home')" id="nav-home" class="active">🏠 Home</button>
+        <button onclick="showSection('aim')" id="nav-aim">🎯 Aim</button>
+        <button onclick="showSection('theory')" id="nav-theory">📖 Theory</button>
+        <button onclick="showSection('procedure')" id="nav-procedure">📋 Procedure</button>
+        <button onclick="showSection('simulation')" id="nav-simulation">🧪 Simulation</button>
+        <button onclick="showSection('examples')" id="nav-examples">📝 Examples</button>
+        <button onclick="showSection('quiz')" id="nav-quiz">✏️ Quiz</button>
+        <button onclick="showSection('references')" id="nav-references">📚 References</button>
+    </nav>
+    <button id="theme-toggle">🌙 Toggle Theme</button>
+</aside>
+
+<main>
+    <section id="home" class="content-section active">
+        <div class="card hero-card">
+            <div class="hero-badge">Mathematics Laboratory</div>
+            <h1>Conversion into Polar Form for Double Integration</h1>
+            <p>Master coordinate transformations and Jacobian mappings through interactive visualization.</p>
+            <div class="hero-actions">
+                <button class="btn" onclick="showSection('simulation')">Launch Simulation</button>
+                <button class="btn secondary-btn" onclick="showSection('theory')">Explore Theory</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="aim" class="content-section">
+        <div class="card">
+            <h1>Experimental Aim</h1>
+            <p>To analyze the transformation from Cartesian $(x,y)$ to Polar $(r,\theta)$ coordinates for double integration.</p>
+        </div>
+    </section>
+
+    <section id="theory" class="content-section">
+        <div class="card">
+            <h1>Mathematical Theory</h1>
+            <div class="math-block">$$x = r\cos\theta, \quad y = r\sin\theta$$</div>
+            <h2>Jacobian Factor</h2>
+            <div class="math-block">$$dx\,dy = r\,dr\,d\theta$$</div>
+            <div class="form-group">
+                <label>Angle θ: <span id="theory-theta-val">45</span>°</label>
+                <input type="range" id="theory-theta" min="0" max="360" step="15" value="45" oninput="runTheoryMathEngine()">
+            </div>
+            <div class="math-block" id="calc-x">$$x = 0.71$$</div>
+        </div>
+    </section>
+
+    <section id="simulation" class="content-section">
+        <h1>Simulation</h1>
+        <div class="grid-2">
+            <div class="card">
+                <label>Select Profile</label>
+                <select id="geom-profile" onchange="runSimulationEngine()">
+                    <option value="circle">Circle</option>
+                    <option value="cardioid">Cardioid</option>
+                    <option value="rose">Rose Curve</option>
+                </select>
+                <div id="sim-integral" class="math-block">$$\int r dr d\theta$$</div>
+                <div id="sim-area" class="math-block">Area = --</div>
+            </div>
+            <div id="plot-area"></div>
+        </div>
+    </section>
+    
+    </main>
+
+<script>
+function showSection(id){
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.getElementById('nav-'+id).classList.add('active');
+    if(id==='simulation') setTimeout(runSimulationEngine, 60);
+}
+
+document.getElementById('theme-toggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    if(window.MathJax) MathJax.typesetPromise(); // Ensures formulas change color instantly
+});
+
+function runTheoryMathEngine(){
+    const deg = parseFloat(document.getElementById('theory-theta').value);
+    document.getElementById('theory-theta-val').innerText = deg;
+    const rad = deg * (Math.PI/180);
+    document.getElementById('calc-x').innerHTML = `$$x = ${Math.cos(rad).toFixed(2)}, \quad y = ${Math.sin(rad).toFixed(2)}$$`;
+    if(window.MathJax) MathJax.typesetPromise();
+}
+
+function runSimulationEngine(){
+    const profile = document.getElementById('geom-profile').value;
+    const scalar = 3; 
+    let rV = [], tV = [];
+    for(let i=0; i<=100; i++){
+        let t = (i/100)*2*Math.PI;
+        tV.push(t * 180/Math.PI);
+        rV.push(profile==='circle' ? scalar : profile==='cardioid' ? scalar*(1+Math.cos(t)) : scalar*Math.cos(3*t));
+    }
+    
+    Plotly.react('plot-area', [{ r: rV, t: tV, type: 'scatterpolar', mode: 'lines', fill: 'toself' }], 
+    { paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: {color: getComputedStyle(document.body).getPropertyValue('--text')} });
+}
+
+runTheoryMathEngine();
+</script>
+</body>
+</html>
