@@ -239,6 +239,27 @@ main{
     white;
 }
 
+/* Ensure Hero Card updates in Dark Mode */
+.dark-mode .hero-card {
+    background: 
+        radial-gradient(
+            circle at top right,
+            rgba(37, 99, 235, 0.2),
+            transparent 40%
+        ),
+        var(--card); /* Uses the dark-mode card color instead of white */
+}
+
+/* Ensure the title and badge remain high-contrast */
+.dark-mode .hero-card h1 {
+    color: var(--text);
+}
+
+.dark-mode .hero-badge {
+    background: rgba(37, 99, 235, 0.3); /* Slightly darker blue for dark mode */
+    color: #60a5fa; /* Lighter blue for readability */
+}
+    
 .hero-badge{
     width:max-content;
 
